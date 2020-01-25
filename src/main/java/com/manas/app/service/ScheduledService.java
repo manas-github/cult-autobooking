@@ -11,9 +11,7 @@ public class ScheduledService {
 	BookingService bookingService;
 	
 
-	//@Scheduled(cron="0 0 22 * * *",zone = "GMT+5:30")
-	
-	@Scheduled(fixedRate = 1000000)
+	@Scheduled(cron="0 0 22 * * *",zone = "GMT+5:30")
 	public void book() {
 		bookingService.book();
 	}
