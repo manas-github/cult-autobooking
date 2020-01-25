@@ -123,6 +123,11 @@ public class BookingService {
 				});
 			});
 		});
+		
+		System.out.println("Filtered classes");
+		filteredClasses.forEach(classes->{
+			System.out.println(classes.toString());
+		});
 
 		HashMap<String,String> hm = new HashMap<>();
 		hm.put(DayOfWeek.MONDAY.name(), mondayTime);
@@ -143,6 +148,10 @@ public class BookingService {
 				
 			}
 		}
+		System.out.println("ToBook classes");
+		toBook.forEach(classes->{
+			System.out.println(classes.toString());
+		});
 		
 		if (toBook.size() > 7) {
 			System.out.println("more than 7 classes found");
@@ -155,25 +164,34 @@ public class BookingService {
 	public void bookNow(List<Classes> classes) {
 		List<BookingResponse> bookingResponses = new ArrayList<>();
 		classes.forEach(classtoBook -> {
-			bookingApi = bookingApi.replace("classid", classtoBook.getId());
-			HttpHeaders headers = new HttpHeaders();
-			headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-			headers.add("apikey", apiKey);
-			headers.add("cookie", cookie);
-			HttpEntity entity = new HttpEntity(headers);
-			ResponseEntity<String> response = restTemplate.exchange(bookingApi, HttpMethod.POST, entity, String.class);
-			String result = response.getBody().toString();
 			try {
-				BookingResponse res = new ObjectMapper().readValue(response.getBody().toString(),
-						BookingResponse.class);
-				bookingResponses.add(res);
-			} catch (JsonMappingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (JsonProcessingException e) {
-				// TODO Auto-generated catch block
+				String bookingApiWithId = bookingApi.replace("classid", classtoBook.getId());
+				HttpHeaders headers = new HttpHeaders();
+				headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+				headers.add("apikey", apiKey);
+				headers.add("cookie", cookie);
+				HttpEntity entity = new HttpEntity(headers);
+				System.out.println(bookingApi);
+				ResponseEntity<String> response = restTemplate.exchange(bookingApiWithId, HttpMethod.POST, entity, String.class);
+				String result = response.getBody().toString();
+				System.out.println(result);
+				try {
+					BookingResponse res = new ObjectMapper().readValue(response.getBody().toString(),
+							BookingResponse.class);
+					bookingResponses.add(res);
+					System.out.println(res.toString());
+				} catch (JsonMappingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (JsonProcessingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} catch (Exception e) {
+				// TODO: handle exception
 				e.printStackTrace();
 			}
+
 		});
 		sendConfirmationMailAndSms(bookingResponses);
 	}
@@ -194,8 +212,12 @@ public class BookingService {
 		for (int i = 0; i < confMsg.size(); i++) {
 			emailBody += "<p>" + confMsg.get(i) + ".</p>";
 		}
-
-		sendEMAIL(emailBody, message);
+		try {
+			sendEMAIL(emailBody, message);	
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+		System.out.println("Completed");
 
 	}
 
@@ -219,6 +241,8 @@ public class BookingService {
 				.header("authorization", "FhLS3qKj4jFejhMyj8MXIMhY7Nzupb7dQJeNjYgXovjBK1HRVdtTc0kGxHRU")
 				.header("Content-Type", "application/x-www-form-urlencoded")
 				.body("sender_id=FSTSMS&message=" + msg + "&language=english&route=p&numbers=" + mobile).asString();
+		System.out.println(response.getBody().toString());
+		System.out.print(response.getStatus()+response.getStatusText());
 
 	}
 	

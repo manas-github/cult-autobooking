@@ -14,6 +14,12 @@ import lombok.Setter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Classes {
 
+	@Override
+	public String toString() {
+		return "Classes [id=" + id + ", productType=" + productType + ", date=" + date + ", startTime=" + startTime
+				+ ", endTime=" + endTime + ", workoutId=" + workoutId + ", centreID=" + centreID + ", availableSeats="
+				+ availableSeats + ", workoutName=" + workoutName + ", state=" + state + "]";
+	}
 	public String getId() {
 		return id;
 	}
